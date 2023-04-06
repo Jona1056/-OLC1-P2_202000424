@@ -123,9 +123,18 @@ function Home() {
     }
   
     const tab = tabData.find((tab) => tab.id === activeTab);
-   
-      try {
-        const [fileHandle] = await window.showSaveFilePicker({
+  
+    try {
+      // Obtener el contenido del área de texto de la pestaña activa
+      const textarea = document.querySelector(`#area`);
+      if (textarea) {
+        const contenido = textarea.value;
+  
+        // Solicitar persistencia de acceso a la ubicación del archivo del new tab activo
+        await navigator.storage.persist();
+  
+        // Escribir el contenido en el archivo del new tab activo
+        const fileHandle = await window.showSaveFilePicker({
           suggestedName: tab.name,
           types: [
             {
@@ -138,12 +147,15 @@ function Home() {
         });
   
         const writableStream = await fileHandle.createWritable();
-        await writableStream.write(tab.content);
+        await writableStream.write(contenido);
         await writableStream.close();
-      } catch (err) {
-        console.error(err);
+        console.log(`Archivo guardado en: ${fileHandle.name}`);
+      } else {
+        console.error('No se pudo encontrar el elemento de texto en el área de texto de la pestaña activa');
       }
-    
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
