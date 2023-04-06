@@ -123,10 +123,10 @@ function Home() {
     }
   
     const tab = tabData.find((tab) => tab.id === activeTab);
-    if (tab && tab.file) {
+   
       try {
-        const [fileHandle] = await window.showOpenFilePicker({
-          suggestedName: tab.file.name,
+        const [fileHandle] = await window.showSaveFilePicker({
+          suggestedName: tab.name,
           types: [
             {
               description: 'Archivos de texto',
@@ -137,13 +137,13 @@ function Home() {
           ],
         });
   
-        const writable = await fileHandle.createWritable();
-        await writable.write(new Blob([tab.content], { type: 'text/plain' }));
-        await writable.close();
+        const writableStream = await fileHandle.createWritable();
+        await writableStream.write(tab.content);
+        await writableStream.close();
       } catch (err) {
         console.error(err);
       }
-    }
+    
   };
 
   return (
